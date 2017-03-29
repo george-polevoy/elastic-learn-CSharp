@@ -9,9 +9,9 @@ namespace ElasticChallenge.Facility
 {
     public class ElasticDocumentIndexer : IDocumentIndexer
     {
-        private const string MatchedTermsAggregate = "matchedTerms";
-        private const string AnalyzerWithStopwordsIdentifier = "analyze_with_stopwords";
-        private const string AnalyzerForAllWords = "analyze_all";
+        private const string MatchedTermsAggregateIdentifier = "matched_terms";
+        private const string WithStopwordsAnalyzerIdentifier = "analyze_with_stopwords";
+        private const string ForAllWordsAnalyzerIdentifier = "analyze_all";
         private readonly ILogger<ElasticDocumentIndexer> _logger;
         private readonly EssayElasticSetup _setup;
 
@@ -41,10 +41,10 @@ namespace ElasticChallenge.Facility
                 .Settings(s => s
                     .Analysis(a => a
                         .Analyzers(aa => aa
-                            .Snowball(AnalyzerWithStopwordsIdentifier, sd => sd.Language(SnowballLanguage.Russian)
+                            .Snowball(WithStopwordsAnalyzerIdentifier, sd => sd.Language(SnowballLanguage.Russian)
                                 .StopWords("как", "почему", "зачем", "очевидно")
                             )
-                            .Snowball(AnalyzerForAllWords, sd => sd.Language(SnowballLanguage.Russian))
+                            .Snowball(ForAllWordsAnalyzerIdentifier, sd => sd.Language(SnowballLanguage.Russian))
                         )
                         .CharFilters(cf => cf.HtmlStrip("html"))
                     )));
@@ -58,8 +58,8 @@ namespace ElasticChallenge.Facility
             return map
                 .Properties(properties =>
                     properties
-                        .Text(d => d.Name(ed => ed.Title).Analyzer(AnalyzerForAllWords))
-                        .Text(d => d.Name(ed => ed.Content).Analyzer(AnalyzerWithStopwordsIdentifier))
+                        .Text(d => d.Name(ed => ed.Title).Analyzer(ForAllWordsAnalyzerIdentifier))
+                        .Text(d => d.Name(ed => ed.Content).Analyzer(WithStopwordsAnalyzerIdentifier))
                         .Keyword(kp => kp.Name(ed => ed.Terms)));
         }
 
@@ -93,7 +93,7 @@ namespace ElasticChallenge.Facility
                     .Source(MakeSource)
                     .Aggregations(MakeAggregations));
 
-            var facets = result.Aggs.Terms<string>(MatchedTermsAggregate);
+            var facets = result.Aggs.Terms<string>(MatchedTermsAggregateIdentifier);
 
             var essaySearchResponse = new EssaySearchResponse(
                 result.Hits.Select(x => new EssayBrief(Guid.Parse(x.Id), x.Source.Title)).ToList(),
@@ -106,7 +106,7 @@ namespace ElasticChallenge.Facility
         {
             return acd
                 .Terms(
-                    MatchedTermsAggregate,
+                    MatchedTermsAggregateIdentifier,
                     t => t
                         .Field(x => x.Terms)
                         .Order(TermsOrder.CountDescending)
