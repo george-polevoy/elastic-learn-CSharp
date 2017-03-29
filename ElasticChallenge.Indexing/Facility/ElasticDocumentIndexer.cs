@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using ElasticChallenge.Model;
@@ -42,7 +42,7 @@ namespace ElasticChallenge.Facility
                     .Analysis(a => a
                         .Analyzers(aa => aa
                             .Snowball(AnalyzerWithStopwordsIdentifier, sd => sd.Language(SnowballLanguage.Russian)
-                                .StopWords("êàê", "ïî÷åìó", "çà÷åì", "î÷åâèäíî")
+                                .StopWords("ÐºÐ°Ðº", "Ð¿Ð¾Ñ‡ÐµÐ¼Ñƒ", "Ð·Ð°Ñ‡ÐµÐ¼", "Ð¾Ñ‡ÐµÐ²Ð¸Ð´Ð½Ð¾")
                             )
                             .Snowball(AnalyzerForAllWords, sd => sd.Language(SnowballLanguage.Russian))
                         )
