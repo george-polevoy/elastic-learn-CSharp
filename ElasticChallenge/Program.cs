@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using System.IO;
 using Microsoft.AspNetCore.Hosting;
 
 namespace ElasticChallenge
@@ -21,6 +16,8 @@ namespace ElasticChallenge
                 .Build();
 
             host.Run();
+
+            // Hey, indexing is not here. Please run ElasticSearch.Indexing.Console application.
         }
     }
 }

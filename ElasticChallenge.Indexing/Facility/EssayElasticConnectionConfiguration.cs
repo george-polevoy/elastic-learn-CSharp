@@ -5,7 +5,8 @@ namespace ElasticChallenge.Facility
 {
     public class EssayElasticSetup
     {
-        public const string IndexName = "essayssearch";
+        public string IndexName => "essayssearch";
+
         private readonly ConnectionSettings _connectionSettings;
 
         public EssayElasticSetup()

@@ -8,6 +8,11 @@ namespace ElasticChallenge.Indexing
     class Program
     {
         /// <summary>
+        /// Number of documents to generate for the index to be a representable sample.
+        /// </summary>
+        private const int RequiredCount = 2000;
+
+        /// <summary>
         /// I don't dig the concept of building the index at app startup, so I provide this console app to create index.
         /// </summary>
         /// <param name="args"></param>
@@ -17,7 +22,8 @@ namespace ElasticChallenge.Indexing
             ConfigureServices(serviceCollection);
             var buildServiceProvider = serviceCollection.BuildServiceProvider();
             var reIndexCommand = buildServiceProvider.GetService<ReIndexCommand>();
-            reIndexCommand.RequiredCount = 2000;
+
+            reIndexCommand.RequiredCount = RequiredCount;
             Task.Run(() => reIndexCommand.RunAsync()).Wait();
         }
 

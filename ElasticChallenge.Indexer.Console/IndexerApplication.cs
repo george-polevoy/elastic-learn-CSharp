@@ -10,8 +10,12 @@ using Microsoft.Extensions.Logging;
 
 namespace ElasticChallenge.Indexing
 {
+    /// <summary>
+    /// Performs the indexing operation.
+    /// </summary>
     public class ReIndexCommand
     {
+        private const int MaxParallelRequests = 100;
         private readonly IBoolshitEssayGenerator _boolshitEssayGenerator;
         private readonly IDocumentIndexer _indexer;
         private readonly ILogger<ReIndexCommand> _logger;
@@ -28,14 +32,11 @@ namespace ElasticChallenge.Indexing
         public async Task RunAsync()
         {
             _logger.LogInformation("Indexing started.");
-
             _logger.LogInformation("Insuring index");
 
             await _indexer.ReCreateIndexAsync();
 
-            const int maxParallelRequests = 500;
-
-            var noMoreThanFewParallelRequests = new SemaphoreSlim(maxParallelRequests, maxParallelRequests);
+            var noMoreThanFewParallelRequests = new SemaphoreSlim(MaxParallelRequests, MaxParallelRequests);
 
             var allTasks = new ConcurrentDictionary<Guid, Task>();
 
@@ -75,6 +76,11 @@ namespace ElasticChallenge.Indexing
                 await Task.WhenAll(leftTasks);
         }
 
+        /// <summary>
+        /// Generates random combinations.
+        /// Those with a single theme are frequent, those with multiple themes are rare, according to probability rules.
+        /// </summary>
+        /// <returns></returns>
         private static IEnumerable<List<ThemeMetadata>> GetRandomThemeCombinations()
         {
             var r = new Random(Guid.NewGuid().GetHashCode());

@@ -24,26 +24,36 @@ namespace ElasticChallenge.Facility
         public async Task ReCreateIndexAsync()
         {
             var client = _setup.GetClient();
-            if ((await client.IndexExistsAsync(EssayElasticSetup.IndexName)).Exists)
-                await client.DeleteIndexAsync(EssayElasticSetup.IndexName);
-            var indexAsync = await client.CreateIndexAsync(EssayElasticSetup.IndexName, i => i
+            await RemoveIndexIfNeeded(client);
+            await CreateIndex(client);
+        }
+
+        private async Task RemoveIndexIfNeeded(IElasticClient client)
+        {
+            if ((await client.IndexExistsAsync(_setup.IndexName)).Exists)
+                await client.DeleteIndexAsync(_setup.IndexName);
+        }
+
+        private async Task CreateIndex(IElasticClient client)
+        {
+            var indexAsync = await client.CreateIndexAsync(_setup.IndexName, i => i
                 .Mappings(m => m.Map<EssayDocument>(MapEssay))
                 .Settings(s => s
                     .Analysis(a => a
-                            .Analyzers(aa => aa
-                                .Snowball(AnalyzerWithStopwordsIdentifier, sd => sd.Language(SnowballLanguage.Russian)
-                                    .StopWords("как", "почему", "зачем", "очевидно")
-                                )
-                                .Snowball(AnalyzerForAllWords, sd => sd.Language(SnowballLanguage.Russian))
+                        .Analyzers(aa => aa
+                            .Snowball(AnalyzerWithStopwordsIdentifier, sd => sd.Language(SnowballLanguage.Russian)
+                                .StopWords("как", "почему", "зачем", "очевидно")
                             )
-                            .CharFilters(cf => cf.HtmlStrip("html"))
+                            .Snowball(AnalyzerForAllWords, sd => sd.Language(SnowballLanguage.Russian))
+                        )
+                        .CharFilters(cf => cf.HtmlStrip("html"))
                     )));
 
             if (!indexAsync.IsValid)
                 _logger.LogError("Index creation operation is reported as invalid.");
         }
 
-        private TypeMappingDescriptor<EssayDocument> MapEssay(TypeMappingDescriptor<EssayDocument> map)
+        private static TypeMappingDescriptor<EssayDocument> MapEssay(TypeMappingDescriptor<EssayDocument> map)
         {
             return map
                 .Properties(properties =>

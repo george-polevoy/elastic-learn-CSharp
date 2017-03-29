@@ -5,7 +5,7 @@ namespace ElasticChallenge.Facility
 {
     /// <summary>
     /// Indexes and searches documents.
-    /// TODO: Consider splitting to separate indexing and searching interfaces
+    /// TODO: Consider splitting to separate interfaces for indexing and searching
     /// </summary>
     public interface IDocumentIndexer
     {
@@ -19,6 +19,9 @@ namespace ElasticChallenge.Facility
         /// </summary>        
         Task AppendDocumentAsync(EssayDocument request);
 
+        /// <summary>
+        /// Searches the essays in the index.
+        /// </summary>
         Task<EssaySearchResponse> SearchEssays(EssaySearchRequest searchRequest);
     }
 }
